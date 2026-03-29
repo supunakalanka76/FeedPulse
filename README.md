@@ -247,3 +247,14 @@ Contributions are welcome.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ by Supun Akalanka**
+
+[![GitHub](https://img.shields.io/badge/GitHub-supunakalanka76-181717?style=flat&logo=github)](https://github.com/supunakalanka76)
+
+---
+
