@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { FeedbackFormData } from "@/types/feedback";
+import toast from "react-hot-toast";
 
 const initialForm: FeedbackFormData = {
   title: "",
@@ -29,9 +30,7 @@ export default function FeedbackForm() {
   const validateForm = () => {
     const newErrors: FormErrors = {};
 
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
-    }
+    if (!formData.title.trim()) newErrors.title = "Title is required";
 
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
@@ -39,9 +38,7 @@ export default function FeedbackForm() {
       newErrors.description = "Description must be at least 20 characters";
     }
 
-    if (!formData.category) {
-      newErrors.category = "Category is required";
-    }
+    if (!formData.category) newErrors.category = "Category is required";
 
     if (
       formData.submitterEmail.trim() &&
@@ -55,19 +52,14 @@ export default function FeedbackForm() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
 
     setSuccessMessage("");
     setServerError("");
@@ -76,11 +68,16 @@ export default function FeedbackForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fix the highlighted fields.");
+      return;
+    }
 
     setIsSubmitting(true);
     setSuccessMessage("");
     setServerError("");
+
+    const toastId = toast.loading("Submitting feedback...");
 
     try {
       const payload = {
@@ -94,27 +91,28 @@ export default function FeedbackForm() {
       const response = await api.post("/feedback", payload);
 
       if (response.data?.success) {
+        toast.success("Feedback submitted successfully!", { id: toastId });
+
         setSuccessMessage("Feedback submitted successfully.");
         setFormData(initialForm);
         setErrors({});
       } else {
-        setServerError(response.data?.error || "Something went wrong.");
+        const msg = response.data?.error || "Something went wrong.";
+        toast.error(msg, { id: toastId });
+        setServerError(msg);
       }
     } catch (error: unknown) {
       const apiError = error as {
-        response?: {
-          data?: {
-            error?: string;
-            message?: string;
-          };
-        };
+        response?: { data?: { error?: string; message?: string } };
       };
 
-      setServerError(
+      const msg =
         apiError.response?.data?.error ||
-          apiError.response?.data?.message ||
-          "Failed to submit feedback."
-      );
+        apiError.response?.data?.message ||
+        "Failed to submit feedback.";
+
+      toast.error(msg, { id: toastId });
+      setServerError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -127,13 +125,17 @@ export default function FeedbackForm() {
           Submit Product Feedback
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          Share bugs, feature requests, or improvements to help the team build better.
+          Share bugs, feature requests, or improvements to help the team build
+          better.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="title"
+            className="mb-2 block text-sm font-medium text-gray-700"
+          >
             Title
           </label>
           <input
@@ -178,7 +180,10 @@ export default function FeedbackForm() {
         </div>
 
         <div>
-          <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="category"
+            className="mb-2 block text-sm font-medium text-gray-700"
+          >
             Category
           </label>
           <select
@@ -240,6 +245,7 @@ export default function FeedbackForm() {
           </div>
         </div>
 
+        {/* Optional inline messages (you can remove these if you want only toasts) */}
         {successMessage && (
           <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             {successMessage}
