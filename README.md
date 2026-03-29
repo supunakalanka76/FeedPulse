@@ -204,13 +204,17 @@ npm start
 Add screenshots to a folder like `docs/screenshots/` and link them here.
 
 Example:
-- `docs/screenshots/dashboard.png`
-- `docs/screenshots/feedback-form.png`
+- `docs/screenshots/admin_dashboard.png`
+- `docs/screenshots/feedback_form.png`
 
-```md
-![Dashboard](docs/screenshots/dashboard.png)
-![Feedback Form](docs/screenshots/feedback-form.png)
-```
+### Public Feedback Page
+![Feedback Form](./docs/screenshots/feedback_form.png)
+
+### Admin Dashboard
+![Dashboard](./docs/screenshots/admin_dashboard.png)
+
+### Login Page
+![Login](./docs/screenshots/login_page.png)
 
 ---
 

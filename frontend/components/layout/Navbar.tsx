@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { getAuthToken } from "@/lib/auth";
+import { useAuthToken, clearAuthToken } from "@/lib/auth-store";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const token = getAuthToken();
+  const token = useAuthToken();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    clearAuthToken();
     router.push("/login");
   };
 
