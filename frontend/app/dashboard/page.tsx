@@ -5,6 +5,8 @@ import { api } from "@/lib/api";
 import { getAuthToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
+import toast from "react-hot-toast";
+
 type FeedbackItem = {
   _id: string;
   title: string;
@@ -171,10 +173,12 @@ const fetchFeedback = useCallback(async () => {
   }, [router]);
 
   const updateStatus = async (id: string, newStatus: string) => {
+    const toastId = toast.loading("Updating status...");
+
     try {
       const token = getAuthToken();
-
       if (!token) {
+        toast.error("Session expired. Please login again.", { id: toastId });
         router.push("/login");
         return;
       }
@@ -184,20 +188,16 @@ const fetchFeedback = useCallback(async () => {
       await api.patch(
         `/feedback/${id}`,
         { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setItems((prev) =>
         prev.map((item) =>
-          item._id === id
-            ? { ...item, status: newStatus as FeedbackItem["status"] }
-            : item
+          item._id === id ? { ...item, status: newStatus as FeedbackItem["status"] } : item
         )
       );
+    
+      toast.success("Status updated", { id: toastId });
     } catch (err: unknown) {
       const errorMessage =
         (err && typeof err === "object" && "response" in err
@@ -206,8 +206,8 @@ const fetchFeedback = useCallback(async () => {
             (err as { response?: { data?: { error?: string; message?: string } } })
               .response?.data?.message
           : null) || "Failed to update status.";
-
-      alert(errorMessage);
+        
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setUpdatingId(null);
     }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,26 +22,26 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
-
+      const res = await api.post("/auth/login", { email, password });
       const token = res.data?.data?.token;
 
       if (token) {
         localStorage.setItem("token", token);
+        toast.success("Logged in successfully");
         router.push("/dashboard");
       } else {
+        toast.error("Login failed");
         setError("Login failed");
       }
     } catch (err) {
-      const error = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(
-        error?.response?.data?.error ||
-          error?.response?.data?.message ||
-          "Invalid credentials"
-      );
+      const errorObj = err as { response?: { data?: { error?: string; message?: string } } };
+      const msg =
+        errorObj?.response?.data?.error ||
+        errorObj?.response?.data?.message ||
+        "Invalid credentials";
+
+      toast.error(msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }

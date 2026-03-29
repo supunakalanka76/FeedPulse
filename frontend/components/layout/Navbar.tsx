@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthToken, clearAuthToken } from "@/lib/auth-store";
 
+import toast from "react-hot-toast";
+
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -12,6 +15,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     clearAuthToken();
+    toast.success("Logged out successfully");
     router.push("/login");
   };
 
