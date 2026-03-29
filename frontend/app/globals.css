@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
+/* -------------------------------------------------------
+   Design tokens (CSS variables)
+   - Keep tokens generic (bg/surface/text/border/accent)
+   - Tailwind can reference these through your @theme inline
+-------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f8fafc; /* subtle section background */
+  --text: #0f172a;      /* slate-900 */
+  --text-2: #475569;    /* slate-600 */
+  --muted: #64748b;     /* slate-500 */
+  --border: rgba(15, 23, 42, 0.10);
+
+  /* Accent (indigo) */
+  --accent: #4f46e5;          /* indigo-600 */
+  --accent-foreground: #ffffff;
+  --ring: rgba(79, 70, 229, 0.35);
+
+  /* Status */
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+
+  /* Radii + shadow */
+  --radius: 12px;
+  --shadow-soft: 0 1px 2px rgba(2, 6, 23, 0.06), 0 8px 24px rgba(2, 6, 23, 0.06);
 }
 
+.dark {
+  --bg: #0b1220;              /* deep slate/navy */
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --text: rgba(255, 255, 255, 0.92);
+  --text-2: rgba(255, 255, 255, 0.70);
+  --muted: rgba(255, 255, 255, 0.55);
+  --border: rgba(255, 255, 255, 0.10);
+
+  --accent: #6366f1;          /* indigo-500 (slightly brighter in dark) */
+  --accent-foreground: #0b1220;
+  --ring: rgba(99, 102, 241, 0.40);
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.35), 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* Hook variables into Tailwind v4 theme tokens (what you started doing) */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+
+  /* Extra tokens you can use via arbitrary values or map in tailwind.config later */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-text-2: var(--text-2);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+
+  --radius: var(--radius);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* -------------------------------------------------------
+   Base styles
+-------------------------------------------------------- */
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  text-rendering: optimizeLegibility;
+}
+
+/* Better default borders, selection, and focus */
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: rgba(79, 70, 229, 0.22);
+}
+
+/* Accessible focus ring across the app */
+:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: calc(var(--radius) - 4px);
+}
+
+/* Make media elements behave */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Nicer form defaults (still Tailwind-friendly) */
+input,
+textarea,
+select {
+  background: transparent;
+  color: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+/* Optional: smoother scroll */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

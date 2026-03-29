@@ -1,10 +1,10 @@
-import { 
-  Feedback, 
-  IFeedback 
+import {
+  Feedback,
+  IFeedback,
 } from "../models/feedback.model";
-import { 
+import {
   analyzeFeedbackWithGemini,
-  generateFeedbackSummaryWithGemini, 
+  generateFeedbackSummaryWithGemini,
 } from "./gemini.service";
 
 type FeedbackQuery = {
@@ -14,6 +14,7 @@ type FeedbackQuery = {
   limit?: string;
   sortBy?: string;
   sortOrder?: string;
+  search?: string;
 };
 
 // Service to create new feedback
@@ -77,7 +78,7 @@ export const createFeedbackService = async (
   return feedback;
 };
 
-// Service to retrieve feedback with filtering, pagination, and sorting
+// Service to retrieve feedback with filtering, search, pagination, and sorting
 export const getAllFeedbackService = async (query: FeedbackQuery) => {
   const {
     category,
@@ -86,6 +87,7 @@ export const getAllFeedbackService = async (query: FeedbackQuery) => {
     limit = "10",
     sortBy = "createdAt",
     sortOrder = "desc",
+    search = "",
   } = query;
 
   const filters: Record<string, any> = {};
@@ -96,6 +98,13 @@ export const getAllFeedbackService = async (query: FeedbackQuery) => {
 
   if (status) {
     filters.status = status;
+  }
+
+  if (search.trim()) {
+    filters.$or = [
+      { title: { $regex: search.trim(), $options: "i" } },
+      { ai_summary: { $regex: search.trim(), $options: "i" } },
+    ];
   }
 
   const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
@@ -178,7 +187,7 @@ export const deleteFeedbackService = async (id: string) => {
   return deletedFeedback;
 };
 
-// Analyze feedback using Gemini AI
+// Service to generate AI summary for feedback from the last 7 days
 export const getFeedbackSummaryService = async () => {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
