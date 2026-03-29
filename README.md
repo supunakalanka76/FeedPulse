@@ -246,8 +246,4 @@ Contributions are welcome.
 
 ## License
 
-Add a `LICENSE` file to define the license for this project (e.g., MIT).
-
-Example (MIT):
-- Create a file named `LICENSE`
-- Add MIT license text
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
